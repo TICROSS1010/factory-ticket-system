@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Factory Ticket System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0f1117;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+        }
+
+        .container {
+            width: 300px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 44px;
+        }
+
+        .label {
+            color: #f59e0b;
+            font-size: 10px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .title {
+            color: #f9fafb;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            color: #374151;
+            font-size: 10px;
+            letter-spacing: 2px;
+            margin-top: 8px;
+        }
+
+        .field {
+            margin-bottom: 24px;
+        }
+
+        .field-label {
+            color: #6b7280;
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .field input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #374151;
+            color: #e5e7eb;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            padding: 8px 0;
+            outline: none;
+        }
+
+        .field input:focus {
+            border-bottom-color: #f59e0b;
+        }
+
+        .error {
+            color: #ef4444;
+            font-size: 11px;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .btn {
+            width: 100%;
+            background: #f59e0b;
+            color: #0f1117;
+            border: none;
+            padding: 14px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        .btn:hover {
+            background: #d97706;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="label">Internal Operations</div>
+        <div class="title">Factory Ticket System</div>
+        <div class="subtitle">DEV MODE // v1.0</div>
+    </div>
+
+    <form th:action="@{/login}" method="post">
+        <div class="field">
+            <div class="field-label">Username</div>
+            <input type="text" name="username" autofocus/>
+        </div>
+
+        <div class="field">
+            <div class="field-label">Password</div>
+            <input type="password" name="password"/>
+        </div>
+
+        <div class="error" th:if="${param.error}">
+            Invalid username or password
+        </div>
+
+        <button class="btn" type="submit">Sign In</button>
+    </form>
+</div>
+
+</body>
+</html>

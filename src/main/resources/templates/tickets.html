@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Factory Ticket System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #111827;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+        }
+
+        /* ── Navbar ───────────────────────────────────────────────────── */
+        .navbar {
+            background: #1f2937;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #374151;
+        }
+
+        .nav-title {
+            color: #f9fafb;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-user {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .nav-role {
+            background: #f59e0b;
+            color: #111827;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 3px;
+            letter-spacing: 1px;
+        }
+
+        .nav-logout {
+            color: #6b7280;
+            font-size: 12px;
+            text-decoration: none;
+        }
+
+        .nav-logout:hover {
+            color: #9ca3af;
+        }
+
+        /* ── Page content ─────────────────────────────────────────────── */
+        .content {
+            padding: 16px 20px;
+        }
+
+        .queue-count {
+            color: #9ca3af;
+            font-size: 11px;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        /* ── Table ────────────────────────────────────────────────────── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        thead tr {
+            border-bottom: 1px solid #374151;
+        }
+
+        th {
+            padding: 8px;
+            text-align: left;
+            color: #6b7280;
+            font-size: 10px;
+            letter-spacing: 1px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #172033;
+        }
+
+        tbody tr:nth-child(odd) {
+            background: #1f2937;
+        }
+
+        tbody tr:hover {
+            background: #243447;
+        }
+
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        /* ── Cell styles ──────────────────────────────────────────────── */
+        .order-id {
+            color: #f59e0b;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .text-main {
+            color: #e5e7eb;
+        }
+
+        .text-sub {
+            color: #9ca3af;
+            font-size: 11px;
+        }
+
+        /* ── Priority badges ──────────────────────────────────────────── */
+        .badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 3px;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        .badge-RUSH   { background: #dc2626; }
+        .badge-HIGH   { background: #d97706; }
+        .badge-NORMAL { background: #16a34a; }
+
+        /* ── Action buttons ───────────────────────────────────────────── */
+        .actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-confirm { background: #16a34a; }
+        .btn-reject  { background: #dc2626; }
+        .btn-start   { background: #2563eb; }
+        .btn-end     { background: #2563eb; }
+        .btn-pass    { background: #16a34a; }
+        .btn-fail    { background: #dc2626; }
+        .btn-packed  { background: #16a34a; }
+        .btn-shipped { background: #0f766e; }
+
+        .btn {
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 3px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            opacity: 0.85;
+        }
+
+        /* ── Empty state ──────────────────────────────────────────────── */
+        .empty {
+            text-align: center;
+            color: #4b5563;
+            padding: 60px 0;
+            font-size: 13px;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <span class="nav-title">FACTORY TICKET SYSTEM</span>
+    <div class="nav-right">
+        <span class="nav-user" sec:authentication="name">user</span>
+        <span class="nav-role" th:text="${role}">ROLE</span>
+        <a class="nav-logout" th:href="@{/logout}">sign out</a>
+    </div>
+</div>
+
+<!-- Content -->
+<div class="content">
+
+    <div class="queue-count"
+         th:text="${tickets.size()} + ' ORDERS IN QUEUE // RUSH FIRST'">
+        0 ORDERS IN QUEUE
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Priority</th>
+            <th>Due Date</th>
+            <th>Type</th>
+            <th>Qty</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <!-- Empty state -->
+        <tr th:if="${tickets.isEmpty()}">
+            <td colspan="7">
+                <div class="empty">NO ORDERS IN QUEUE</div>
+            </td>
+        </tr>
+
+        <!-- Order rows -->
+        <tr th:each="ticket : ${tickets}">
+            <td class="order-id" th:text="${ticket.orderId}"></td>
+            <td class="text-main" th:text="${ticket.customer}"></td>
+            <td>
+                    <span class="badge"
+                          th:classappend="'badge-' + ${ticket.priority}"
+                          th:text="${ticket.priority}">
+                    </span>
+            </td>
+            <td class="text-sub" th:text="${ticket.dueDate}"></td>
+            <td class="text-main" th:text="${ticket.orderType}"></td>
+            <td class="text-main" th:text="${ticket.quantity}"></td>
+            <td>
+                <div class="actions">
+
+                    <!-- Sales buttons -->
+                    <div sec:authorize="hasRole('SALES')">
+                        <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
+                              method="post" style="display:inline;">
+                            <input type="hidden" name="action" value="CONFIRMED"/>
+                            <button class="btn btn-confirm" type="submit">Confirm</button>
+                        </form>
+                        <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
+                              method="post" style="display:inline;">
+                            <input type="hidden" name="action" value="REJECTED"/>
+                            <button class="btn btn-reject" type="submit">Reject</button>
+                        </form>
+                    </div>
+
+                    <!-- Line worker buttons -->
+                    <div sec:authorize="hasRole('LINE_WORKER')">
+                        <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
+                              method="post" style="display:inline;">
+                            <input type="hidden" name="action" value="STARTED"/>
+                            <button class="btn btn-start" type="submit"
+                                    th:if="${ticket.currentStage.name() == 'LINE_WORKER'}">
+                                Start
+                            </button>
+                            <button class="btn btn-end" type="submit"
+                                    th:if="${ticket.currentStage.name() == 'LINE_WORKER'}">
+                                End
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Quality buttons -->
+                    <div sec:authorize="hasRole('QUALITY')">
+                        <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
+                              method="post" style="display:inline;">
+                            <input type="hidden" name="action" value="PASSED"/>
+                            <button class="btn btn-pass" type="submit">Pass</button>
+                        </form>
+                        <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
+                              method="post" style="display:inline;">
+                            <input type="hidden" name="action" value="FAILED"/>
+                            <button class="btn btn-fail" type="submit">Fail</button>
+                        </form>
+                    </div>
+
+                    <!-- Packer button -->
+                    <div sec:authorize="hasRole('PACKER')">
+                        <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
+                              method="post" style="display:inline;">
+                            <input type="hidden" name="action" value="PACKED"/>
+                            <button class="btn btn-packed" type="submit">Confirm Packed</button>
+                        </form>
+                    </div>
+
+                    <!-- Shipping button -->
+                    <div sec:authorize="hasRole('SHIPPING')">
+                        <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
+                              method="post" style="display:inline;">
+                            <input type="hidden" name="action" value="SHIPPED"/>
+                            <button class="btn btn-shipped" type="submit">Confirm Shipped</button>
+                        </form>
+                    </div>
+
+                </div>
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
