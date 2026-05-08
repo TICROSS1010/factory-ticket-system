@@ -9,22 +9,22 @@ Built as a portfolio project demonstrating Spring Boot, AWS services, and event-
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Backend | Spring Boot 4.x / Java 21 |
-| Frontend | Thymeleaf + CSS |
-| Auth (Dev) | Spring Security form login |
-| Auth (Prod) | AWS Cognito hosted UI |
-| Database (Dev) | DynamoDB Local via Docker |
-| Database (Prod) | AWS DynamoDB |
+| Layer | Technology                               |
+|-------|------------------------------------------|
+| Backend | Spring Boot 4.x / Java 21                |
+| Frontend | Thymeleaf + CSS                          |
+| Auth (Dev) | Spring Security form login               |
+| Auth (Prod) | AWS Cognito hosted UI                    |
+| Database (Dev) | DynamoDB Local                           |
+| Database (Prod) | AWS DynamoDB                             |
 | Queues | AWS SQS FIFO — 15 queues across 5 stages |
-| Notifications | AWS SNS |
-| File Storage | AWS S3 — shipping labels and reports |
-| Batch Jobs | Spring Batch + AWS EventBridge |
-| Deployment | AWS Elastic Beanstalk |
-| Container Registry | AWS ECR |
-| Monitoring | AWS CloudWatch |
-| Infrastructure | AWS CloudFormation |
+| Notifications | AWS SNS                                  |
+| File Storage | AWS S3 — shipping labels and reports     |
+| Batch Jobs | Spring Batch + AWS EventBridge           |
+| Deployment | AWS Elastic Beanstalk                    |
+| Container Registry | AWS ECR                                  |
+| Monitoring | AWS CloudWatch                           |
+| Infrastructure | AWS CloudFormation                       |
 
 ---
 
@@ -68,8 +68,9 @@ All roles share one screen — buttons change based on the logged-in user's role
 
 - Java 21
 - Maven
-- Docker (for DynamoDB Local)
+- DynamoDB Local
 - AWS CLI
+- Docker (optional — only needed if running DynamoDB Local via Docker)
 
 ### 1. Start DynamoDB Local
 
@@ -93,13 +94,23 @@ aws dynamodb create-table --table-name orders --attribute-definitions AttributeN
 aws dynamodb create-table --table-name orderHistory --attribute-definitions AttributeName=orderId,AttributeType=S AttributeName=timestamp,AttributeType=S --key-schema AttributeName=orderId,KeyType=HASH AttributeName=timestamp,KeyType=RANGE --billing-mode PAY_PER_REQUEST --endpoint-url http://localhost:8000
 ```
 
-### 3. Run the app
+### 3. Create SQS Queues
+
+Requires AWS CLI configured with your credentials.
+
+```bash
+bash scripts/create-queues.sh
+```
+
+Creates all 15 FIFO queues across 5 production stages (Rush, High, Normal per stage).
+
+### 4. Run the app
 
 ```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-### 4. Open in browser
+### 5. Open in browser
 
 ```
 http://localhost:8080
@@ -109,11 +120,11 @@ http://localhost:8080
 
 | Username | Password | Role |
 |----------|----------|------|
-| sales1 | test | Sales |
-| line1 | test | Line Worker |
-| quality1 | test | Quality |
-| packer1 | test | Packer |
-| shipping1 | test | Shipping |
+| sales | test | Sales |
+| line | test | Line Worker |
+| quality | test | Quality |
+| packer | test | Packer |
+| shipping | test | Shipping |
 
 ---
 
