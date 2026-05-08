@@ -190,7 +190,12 @@
     <div class="nav-right">
         <span class="nav-user" sec:authentication="name">user</span>
         <span class="nav-role" th:text="${role}">ROLE</span>
-        <a class="nav-logout" th:href="@{/logout}">sign out</a>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" class="nav-logout"
+                    style="background:none; border:none; cursor:pointer; font-family:'Courier New',monospace;">
+                sign out
+            </button>
+        </form>
     </div>
 </div>
 
@@ -258,14 +263,12 @@
                         <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
                               method="post" style="display:inline;">
                             <input type="hidden" name="action" value="STARTED"/>
-                            <button class="btn btn-start" type="submit"
-                                    th:if="${ticket.currentStage.name() == 'LINE_WORKER'}">
-                                Start
-                            </button>
-                            <button class="btn btn-end" type="submit"
-                                    th:if="${ticket.currentStage.name() == 'LINE_WORKER'}">
-                                End
-                            </button>
+                            <button class="btn btn-start" type="submit">Start</button>
+                        </form>
+                        <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
+                              method="post" style="display:inline;">
+                            <input type="hidden" name="action" value="COMPLETED"/>
+                            <button class="btn btn-end" type="submit">End</button>
                         </form>
                     </div>
 

@@ -24,7 +24,8 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/login")
+                        .logoutUrl("/logout")           // POST /logout triggers logout
+                        .logoutSuccessUrl("/login?logout")  // redirect here after
                         .permitAll()
                 )
                 .authorizeHttpRequests(auth -> auth

@@ -3,6 +3,7 @@ package com.factoryapp.repository;
 import com.factoryapp.model.Order;
 import com.factoryapp.model.Priority;
 import com.factoryapp.model.Stage;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
