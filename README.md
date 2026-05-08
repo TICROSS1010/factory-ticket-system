@@ -1,4 +1,5 @@
 > 🚧 **Work in progress** — actively being developed. Core ticket workflow and AWS integration in progress.
+
 # Factory Ticket System
 
 A web-based order ticket management system for an internal factory environment. Workers at each production stage confirm tickets through a role-based interface. The system is event-driven using AWS SQS priority queues, ensuring rush orders are always processed first.
@@ -9,22 +10,22 @@ Built as a portfolio project demonstrating Spring Boot, AWS services, and event-
 
 ## Tech Stack
 
-| Layer | Technology                               |
-|-------|------------------------------------------|
-| Backend | Spring Boot 4.x / Java 21                |
-| Frontend | Thymeleaf + CSS                          |
-| Auth (Dev) | Spring Security form login               |
-| Auth (Prod) | AWS Cognito hosted UI                    |
-| Database (Dev) | DynamoDB Local                           |
-| Database (Prod) | AWS DynamoDB                             |
+| Layer | Technology |
+|-------|------------|
+| Backend | Spring Boot 4.0.6 / Java 21 |
+| Frontend | Thymeleaf + CSS |
+| Auth (Dev) | Spring Security form login |
+| Auth (Prod) | AWS Cognito hosted UI |
+| Database (Dev) | DynamoDB Local |
+| Database (Prod) | AWS DynamoDB |
 | Queues | AWS SQS FIFO — 15 queues across 5 stages |
-| Notifications | AWS SNS                                  |
-| File Storage | AWS S3 — shipping labels and reports     |
-| Batch Jobs | Spring Batch + AWS EventBridge           |
-| Deployment | AWS Elastic Beanstalk                    |
-| Container Registry | AWS ECR                                  |
-| Monitoring | AWS CloudWatch                           |
-| Infrastructure | AWS CloudFormation                       |
+| Notifications | AWS SNS |
+| File Storage | AWS S3 — shipping labels and reports |
+| Batch Jobs | Spring Batch + AWS EventBridge |
+| Deployment | AWS Elastic Beanstalk |
+| Container Registry | AWS ECR |
+| Monitoring | AWS CloudWatch |
+| Infrastructure | AWS CloudFormation |
 
 ---
 
@@ -64,18 +65,19 @@ All roles share one screen — buttons change based on the logged-in user's role
 
 ## Running Locally
 
-### Prerequisites
+### Option A — Local Machine
+
+#### Prerequisites
 
 - Java 21
 - Maven
-- DynamoDB Local
 - AWS CLI
 - Docker (optional — only needed if running DynamoDB Local via Docker)
 
-### 1. Start DynamoDB Local
+#### 1. Start DynamoDB Local
 
 ```bash
-docker-compose up
+docker-compose up -d
 ```
 
 Or if running the DynamoDB Local jar directly:
@@ -84,7 +86,7 @@ Or if running the DynamoDB Local jar directly:
 java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
 ```
 
-### 2. Create DynamoDB tables
+#### 2. Create DynamoDB tables
 
 ```bash
 aws dynamodb create-table --table-name orders --attribute-definitions AttributeName=orderId,AttributeType=S --key-schema AttributeName=orderId,KeyType=HASH --billing-mode PAY_PER_REQUEST --endpoint-url http://localhost:8000
@@ -94,7 +96,7 @@ aws dynamodb create-table --table-name orders --attribute-definitions AttributeN
 aws dynamodb create-table --table-name orderHistory --attribute-definitions AttributeName=orderId,AttributeType=S AttributeName=timestamp,AttributeType=S --key-schema AttributeName=orderId,KeyType=HASH AttributeName=timestamp,KeyType=RANGE --billing-mode PAY_PER_REQUEST --endpoint-url http://localhost:8000
 ```
 
-### 3. Create SQS Queues
+#### 3. Create SQS Queues
 
 Requires AWS CLI configured with your credentials.
 
@@ -104,19 +106,96 @@ bash scripts/create-queues.sh
 
 Creates all 15 FIFO queues across 5 production stages (Rush, High, Normal per stage).
 
-### 4. Run the app
+#### 4. Create properties file
+
+Create `src/main/resources/application-dev.properties` with your AWS credentials:
+
+```properties
+aws.region=us-east-1
+aws.account-id=YOUR_ACCOUNT_ID
+aws.accessKeyId=YOUR_ACCESS_KEY
+aws.secretKey=YOUR_SECRET_KEY
+aws.dynamodb.endpoint=http://localhost:8000
+```
+
+#### 5. Run the app
 
 ```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-### 5. Open in browser
+#### 6. Open in browser
 
 ```
 http://localhost:8080
 ```
 
+---
+
+### Option B — GitHub Codespaces
+
+#### Prerequisites
+
+- AWS account with SQS access
+- AWS access key and secret key
+
+#### 1. Open Codespace
+
+Go to the repo on GitHub, click **Code → Codespaces → Create codespace on main**.
+
+#### 2. Start DynamoDB Local
+
+```bash
+docker-compose up -d
+```
+
+#### 3. Create DynamoDB tables
+
+```bash
+aws dynamodb create-table --table-name orders --attribute-definitions AttributeName=orderId,AttributeType=S --key-schema AttributeName=orderId,KeyType=HASH --billing-mode PAY_PER_REQUEST --endpoint-url http://localhost:8000
+```
+
+```bash
+aws dynamodb create-table --table-name orderHistory --attribute-definitions AttributeName=orderId,AttributeType=S AttributeName=timestamp,AttributeType=S --key-schema AttributeName=orderId,KeyType=HASH AttributeName=timestamp,KeyType=RANGE --billing-mode PAY_PER_REQUEST --endpoint-url http://localhost:8000
+```
+
+#### 4. Create SQS Queues
+
+```bash
+bash scripts/create-queues.sh
+```
+
+#### 5. Create properties file
+
+```bash
+touch src/main/resources/application-dev.properties
+```
+
+Add your AWS credentials to the file:
+
+```properties
+aws.region=us-east-1
+aws.account-id=YOUR_ACCOUNT_ID
+aws.accessKeyId=YOUR_ACCESS_KEY
+aws.secretKey=YOUR_SECRET_KEY
+aws.dynamodb.endpoint=http://localhost:8000
+```
+
+#### 6. Run the app
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+#### 7. Open in browser
+
+Click the **Ports** tab in the terminal panel and open port `8080`.
+
+---
+
 ### Dev login credentials
+
+> These credentials are for development only.
 
 | Username | Password | Role |
 |----------|----------|------|
@@ -195,7 +274,7 @@ src/main/java/com/factoryapp/
 |-|-----|------|
 | Login | Spring Security form login | Cognito hosted UI |
 | Database | DynamoDB Local (localhost:8000) | AWS DynamoDB |
-| Credentials | Dummy keys in properties file | IAM role on Elastic Beanstalk |
+| Credentials | Local properties file | IAM role on Elastic Beanstalk |
 | Activate | `spring.profiles.active=dev` | `SPRING_PROFILES_ACTIVE=prod` |
 
 ---
