@@ -1,0 +1,4 @@
+# Use X-Forwarded-* headers so redirects use the public URL, not localhost.
+# Needed when running behind a proxy (Codespaces, nginx, ALB, etc.).
+server:
+  forward-headers-strategy: framework
