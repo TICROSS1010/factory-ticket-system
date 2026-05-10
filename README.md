@@ -12,11 +12,11 @@ Built as a portfolio project demonstrating Spring Boot, AWS services, and event-
 
 | Layer | Technology |
 |-------|------------|
-| Backend | Spring Boot 4.0.6 / Java 21 |
+| Backend | Spring Boot 4.0.6 / Java 21 (Amazon Corretto) |
 | Frontend | Thymeleaf + CSS |
 | Auth (Dev) | Spring Security form login |
 | Auth (Prod) | AWS Cognito hosted UI |
-| Database (Dev) | DynamoDB Local |
+| Database (Dev) | DynamoDB Local (Docker) |
 | Database (Prod) | AWS DynamoDB |
 | Queues | AWS SQS FIFO — 15 queues across 5 stages |
 | Notifications | AWS SNS |
@@ -69,62 +69,39 @@ All roles share one screen — buttons change based on the logged-in user's role
 
 #### Prerequisites
 
-- Java 21
+- Java 21 (Amazon Corretto)
 - Maven
+- Docker
 - AWS CLI
-- Docker (optional — only needed if running DynamoDB Local via Docker)
 
-#### 1. Start DynamoDB Local
+#### 1. Start DynamoDB Local and create tables
+
+`docker-compose.yml` handles everything automatically — starts DynamoDB Local and creates both tables on startup.
 
 ```bash
 docker-compose up -d
 ```
 
-Or if running the DynamoDB Local jar directly:
+#### 2. Create properties file
 
-```bash
-java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
-```
-
-#### 2. Create DynamoDB tables
-
-```bash
-aws dynamodb create-table --table-name orders --attribute-definitions AttributeName=orderId,AttributeType=S --key-schema AttributeName=orderId,KeyType=HASH --billing-mode PAY_PER_REQUEST --endpoint-url http://localhost:8000
-```
-
-```bash
-aws dynamodb create-table --table-name orderHistory --attribute-definitions AttributeName=orderId,AttributeType=S AttributeName=timestamp,AttributeType=S --key-schema AttributeName=orderId,KeyType=HASH AttributeName=timestamp,KeyType=RANGE --billing-mode PAY_PER_REQUEST --endpoint-url http://localhost:8000
-```
-
-#### 3. Create SQS Queues
-
-Requires AWS CLI configured with your credentials.
-
-```bash
-bash scripts/create-queues.sh
-```
-
-Creates all 15 FIFO queues across 5 production stages (Rush, High, Normal per stage).
-
-#### 4. Create properties file
-
-Create `src/main/resources/application-dev.properties` with your AWS credentials:
+Create `src/main/resources/application-dev.properties`:
 
 ```properties
+amazon.dynamodb.endpoint=http://localhost:8000
 aws.region=us-east-1
-aws.account-id=YOUR_ACCOUNT_ID
-aws.accessKeyId=YOUR_ACCESS_KEY
-aws.secretKey=YOUR_SECRET_KEY
-aws.dynamodb.endpoint=http://localhost:8000
+aws.accessKeyId=fakekey
+aws.secretKey=fakekey
 ```
 
-#### 5. Run the app
+> For SQS, SNS, and S3 you will need real AWS credentials and queue URLs. See [AWS setup](#aws-setup) below.
+
+#### 3. Run the app
 
 ```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-#### 6. Open in browser
+#### 4. Open in browser
 
 ```
 http://localhost:8080
@@ -132,78 +109,77 @@ http://localhost:8080
 
 ---
 
-### Option B — GitHub Codespaces
+### Option B — GitHub Codespaces (recommended)
 
-#### Prerequisites
-
-- AWS account with SQS access
-- AWS access key and secret key
+The `.devcontainer/devcontainer.json` fully automates the environment — Java 21 Corretto, Maven, AWS CLI, and Docker are all pre-installed. DynamoDB Local starts and tables are created automatically via `docker-compose.yml`.
 
 #### 1. Open Codespace
 
-Go to the repo on GitHub, click **Code → Codespaces → Create codespace on main**.
+Go to the repo on GitHub → **Code → Codespaces → Create codespace on main**.
 
-#### 2. Start DynamoDB Local
+The environment builds automatically. Wait for `postCreateCommand` to finish — this downloads Maven dependencies and starts DynamoDB Local.
 
-```bash
-docker-compose up -d
-```
+#### 2. Create properties file
 
-#### 3. Create DynamoDB tables
-
-```bash
-aws dynamodb create-table --table-name orders --attribute-definitions AttributeName=orderId,AttributeType=S --key-schema AttributeName=orderId,KeyType=HASH --billing-mode PAY_PER_REQUEST --endpoint-url http://localhost:8000
-```
-
-```bash
-aws dynamodb create-table --table-name orderHistory --attribute-definitions AttributeName=orderId,AttributeType=S AttributeName=timestamp,AttributeType=S --key-schema AttributeName=orderId,KeyType=HASH AttributeName=timestamp,KeyType=RANGE --billing-mode PAY_PER_REQUEST --endpoint-url http://localhost:8000
-```
-
-#### 4. Create SQS Queues
-
-```bash
-bash scripts/create-queues.sh
-```
-
-#### 5. Create properties file
-
-```bash
-touch src/main/resources/application-dev.properties
-```
-
-Add your AWS credentials to the file:
+Create `src/main/resources/application-dev.properties`:
 
 ```properties
+amazon.dynamodb.endpoint=http://localhost:8000
 aws.region=us-east-1
-aws.account-id=YOUR_ACCOUNT_ID
-aws.accessKeyId=YOUR_ACCESS_KEY
-aws.secretKey=YOUR_SECRET_KEY
-aws.dynamodb.endpoint=http://localhost:8000
+aws.accessKeyId=fakekey
+aws.secretKey=fakekey
 ```
 
-#### 6. Run the app
+> For SQS, SNS, and S3 you will need real AWS credentials. See [AWS setup](#aws-setup) below.
+
+#### 3. Run the app
 
 ```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-#### 7. Open in browser
+#### 4. Open in browser
 
 Click the **Ports** tab in the terminal panel and open port `8080`.
 
 ---
 
+## AWS Setup
+
+Required for SQS queues, SNS notifications, and S3 file storage.
+
+#### Create SQS queues
+
+```bash
+bash scripts/create-queues.sh
+```
+
+Creates all 15 FIFO queues across 5 production stages (Rush, High, Normal per stage).
+
+#### Add real credentials to properties file
+
+```properties
+amazon.dynamodb.endpoint=http://localhost:8000
+aws.region=us-east-1
+aws.accessKeyId=YOUR_ACCESS_KEY
+aws.secretKey=YOUR_SECRET_KEY
+```
+
+> Never commit real credentials. `application-dev.properties` is in `.gitignore`.
+
+---
+
 ### Dev login credentials
 
-> These credentials are for development only.
+> For development only.
 
 | Username | Password | Role |
 |----------|----------|------|
-| sales | test | Sales |
-| line | test | Line Worker |
-| quality | test | Quality |
-| packer | test | Packer |
-| shipping | test | Shipping |
+| sales1 | test | Sales |
+| line1 | test | Line Worker |
+| quality1 | test | Quality |
+| packer1 | test | Packer |
+| shipping1 | test | Shipping |
 
 ---
 
