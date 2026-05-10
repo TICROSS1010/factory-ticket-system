@@ -14,14 +14,4 @@
   "onCreateCommand": "chmod +x mvnw && ./mvnw dependency:resolve",
   "postStartCommand": "docker compose up -d",
   "forwardPorts": [8080, 8000],
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "vmware.vscode-spring-boot",
-        "redhat.java",
-        "vscjava.vscode-maven",
-        "vscjava.vscode-java-debug"
-      ]
-    }
-  }
 }
