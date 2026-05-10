@@ -12,8 +12,7 @@
     }
   },
   "containerEnv": {
-    "JAVA_HOME": "/usr/lib/jvm/java-21-amazon-corretto",
-    "PATH": "/usr/lib/jvm/java-21-amazon-corretto/bin:${PATH}"
+    "JAVA_HOME": "/usr/local/sdkman/candidates/java/current"
   },
   "onCreateCommand": "chmod +x mvnw && ./mvnw dependency:resolve",
   "postStartCommand": "docker compose up -d",
