@@ -11,6 +11,10 @@
       "moby": false
     }
   },
+  "containerEnv": {
+    "JAVA_HOME": "/usr/lib/jvm/java-21-amazon-corretto",
+    "PATH": "/usr/lib/jvm/java-21-amazon-corretto/bin:${PATH}"
+  },
   "onCreateCommand": "chmod +x mvnw && ./mvnw dependency:resolve",
   "postStartCommand": "docker compose up -d",
   "forwardPorts": [8080, 8000]
