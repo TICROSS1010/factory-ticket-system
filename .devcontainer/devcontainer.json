@@ -9,7 +9,7 @@
     },
     "ghcr.io/devcontainers/features/aws-cli:1": {}
   },
-  "postCreateCommand": "mvn dependency:resolve",
+  "postCreateCommand": "mvn dependency:resolve && docker-compose up -d",
   "forwardPorts": [8080, 8000],
   "customizations": {
     "vscode": {
