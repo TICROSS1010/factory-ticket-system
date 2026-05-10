@@ -1,0 +1,24 @@
+{
+  "name": "Factory Ticket System",
+  "image": "mcr.microsoft.com/devcontainers/java:21-amazon-corretto",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "21",
+      "jdkDistribution": "corretto",
+      "installMaven": true
+    },
+    "ghcr.io/devcontainers/features/aws-cli:1": {}
+  },
+  "postCreateCommand": "mvn dependency:resolve",
+  "forwardPorts": [8080, 8000],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vmware.vscode-spring-boot",
+        "redhat.java",
+        "vscjava.vscode-maven",
+        "vscjava.vscode-java-debug"
+      ]
+    }
+  }
+}
