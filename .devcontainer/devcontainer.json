@@ -1,10 +1,9 @@
 {
   "name": "Factory Ticket System",
-  "image": "mcr.microsoft.com/devcontainers/java:21",
   "features": {
     "ghcr.io/devcontainers/features/java:1": {
       "version": "21",
-      "jdkDistribution": "corretto",
+      "jdkDistro": "amzn",
       "installMaven": true
     },
     "ghcr.io/devcontainers/features/aws-cli:1": {},
@@ -13,15 +12,5 @@
     }
   },
   "postCreateCommand": "chmod +x mvnw && ./mvnw dependency:resolve && docker compose up -d",
-  "forwardPorts": [8080, 8000],
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "vmware.vscode-spring-boot",
-        "redhat.java",
-        "vscjava.vscode-maven",
-        "vscjava.vscode-java-debug"
-      ]
-    }
-  }
+  "forwardPorts": [8080, 8000]
 }
