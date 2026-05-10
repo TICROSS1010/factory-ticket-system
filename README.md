@@ -79,7 +79,7 @@ All roles share one screen — buttons change based on the logged-in user's role
 `docker-compose.yml` handles everything automatically — starts DynamoDB Local and creates both tables on startup.
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 #### 2. Create properties file
@@ -111,36 +111,34 @@ http://localhost:8080
 
 ### Option B — GitHub Codespaces (recommended)
 
-The `.devcontainer/devcontainer.json` fully automates the environment — Java 21 Corretto, Maven, AWS CLI, and Docker are all pre-installed. DynamoDB Local starts and tables are created automatically via `docker-compose.yml`.
+The `.devcontainer/devcontainer.json` fully automates the environment:
+
+- Java 21 Corretto, Maven, AWS CLI, and Docker pre-installed
+- `application-dev.properties` created automatically
+- DynamoDB Local starts automatically on every Codespace open
+- Both DynamoDB tables created automatically via `docker-compose.yml`
+
+No manual setup needed.
 
 #### 1. Open Codespace
 
 Go to the repo on GitHub → **Code → Codespaces → Create codespace on main**.
 
-The environment builds automatically. Wait for `postCreateCommand` to finish — this downloads Maven dependencies and starts DynamoDB Local.
+Wait for the environment to finish building — everything is set up automatically.
 
-#### 2. Create properties file
-
-Create `src/main/resources/application-dev.properties`:
-
-```properties
-amazon.dynamodb.endpoint=http://localhost:8000
-aws.region=us-east-1
-aws.accessKeyId=fakekey
-aws.secretKey=fakekey
-```
-
-> For SQS, SNS, and S3 you will need real AWS credentials. See [AWS setup](#aws-setup) below.
-
-#### 3. Run the app
+#### 2. Run the app
 
 ```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-#### 4. Open in browser
+#### 3. Open in browser
 
-Click the **Ports** tab in the terminal panel and open port `8080`.
+Run this in the terminal to get your URL:
+
+```bash
+echo "https://${CODESPACE_NAME}-8080.app.github.dev"
+```
 
 ---
 
@@ -169,7 +167,7 @@ aws.secretKey=YOUR_SECRET_KEY
 
 ---
 
-### Dev login credentials
+## Dev Login Credentials
 
 > For development only.
 
