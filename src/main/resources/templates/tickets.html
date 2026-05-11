@@ -61,6 +61,23 @@
             color: #9ca3af;
         }
 
+        .nav-refresh {
+            color: #6b7280;
+            font-size: 12px;
+            background: none;
+            border: 1px solid #374151;
+            border-radius: 3px;
+            padding: 3px 10px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+
+        .nav-refresh:hover {
+            color: #9ca3af;
+            border-color: #4b5563;
+        }
+
         /* ── Page content ─────────────────────────────────────────────── */
         .content {
             padding: 16px 20px;
@@ -188,6 +205,7 @@
 <div class="navbar">
     <span class="nav-title">FACTORY TICKET SYSTEM</span>
     <div class="nav-right">
+        <button class="nav-refresh" onclick="window.location.reload()">↻ REFRESH</button>
         <span class="nav-user" sec:authentication="name">user</span>
         <span class="nav-role" th:text="${role}">ROLE</span>
         <form th:action="@{/logout}" method="post" style="display:inline;">
