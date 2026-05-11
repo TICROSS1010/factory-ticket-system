@@ -3,6 +3,8 @@ package com.factoryapp.poller;
 import com.factoryapp.model.Order;
 import com.factoryapp.model.Stage;
 import com.factoryapp.repository.OrderRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,6 +20,8 @@ public class StageQueuePoller {
 
     private final SqsClient sqsClient;
     private final OrderRepository orderRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     @Value("${aws.account-id}")
     private String accountId;
@@ -30,12 +34,10 @@ public class StageQueuePoller {
         this.orderRepository = orderRepository;
     }
 
-    // Builds queue URL from stage and priority
     private String queueUrl(String stage, String priority) {
         return "https://sqs." + region + ".amazonaws.com/" + accountId + "/" + stage + "-" + priority + "-queue.fifo";
     }
 
-    // ── Poll every 5 seconds ──────────────────────────────────────────────
     @Scheduled(fixedDelay = 5000)
     public void poll() {
         pollStage(Stage.SALES,       queueUrl("sales", "rush"),    queueUrl("sales", "high"),    queueUrl("sales", "normal"));
@@ -45,19 +47,16 @@ public class StageQueuePoller {
         pollStage(Stage.SHIPPING,    queueUrl("shipping", "rush"), queueUrl("shipping", "high"), queueUrl("shipping", "normal"));
     }
 
-    // ── Poll Rush first, then High, then Normal ───────────────────────────
     private void pollStage(Stage stage, String rush, String high, String normal) {
-        Message message = receiveOne(rush);
-
-        if (message == null) message = receiveOne(high);
-        if (message == null) message = receiveOne(normal);
-
-        if (message != null) {
-            processMessage(message, stage);
+        for (String url : List.of(rush, high, normal)) {
+            Message message = receiveOne(url);
+            if (message != null) {
+                processMessage(message, stage, url);
+                return;
+            }
         }
     }
 
-    // ── Receive one message from a queue ──────────────────────────────────
     private Message receiveOne(String queueUrl) {
         try {
             List<Message> messages = sqsClient.receiveMessage(
@@ -74,14 +73,21 @@ public class StageQueuePoller {
         }
     }
 
-    // ── Process a received message ────────────────────────────────────────
-    private void processMessage(Message message, Stage stage) {
-        String orderId = message.body();
-
-        Order order = orderRepository.findById(orderId);
-        if (order != null) {
+    private void processMessage(Message message, Stage stage, String queueUrl) {
+        try {
+            Order order = objectMapper.readValue(message.body(), Order.class);
             order.setCurrentStage(stage);
+            order.setReturnCount(0); //fix later , this could prove an issue when gets to quality
+            order.setUpdatedAt(order.getCreatedAt()); //may cause issues later?
+
             orderRepository.save(order);
+
+            sqsClient.deleteMessage(DeleteMessageRequest.builder()
+                    .queueUrl(queueUrl)
+                    .receiptHandle(message.receiptHandle())
+                    .build());
+        } catch (Exception e) { //create DLQ if failed to process later
+            System.err.println("Failed to process message: " + e.getMessage());
         }
     }
 }
