@@ -36,5 +36,8 @@ build/
 ### VS Code ###
 .vscode/
 
+### DynamoDB Local ###
+dynamodb-data/
+
 
 
