@@ -1,7 +1,9 @@
 package com.factoryapp.controller;
 
+import com.factoryapp.model.Action;
 import com.factoryapp.model.Stage;
 import com.factoryapp.repository.OrderRepository;
+import com.factoryapp.service.OrderService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,9 +18,11 @@ import java.util.Comparator;
 public class TicketController {
 
     private final OrderRepository orderRepository;
+    private final OrderService orderService;
 
-    public TicketController(OrderRepository orderRepository) {
+    public TicketController(OrderRepository orderRepository, OrderService orderService) {
         this.orderRepository = orderRepository;
+        this.orderService = orderService;
     }
 
     // ── Show login page ───────────────────────────────────────────────────
@@ -51,7 +55,7 @@ public class TicketController {
             @RequestParam String action,
             Authentication auth) {
 
-        // OrderService wired up in next step
+        orderService.processAction(orderId, Action.valueOf(action), auth.getName());
         return "redirect:/tickets";
     }
 
