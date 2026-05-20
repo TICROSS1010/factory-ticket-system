@@ -1,7 +1,10 @@
 package com.factoryapp.poller;
 
+import com.factoryapp.model.Action;
 import com.factoryapp.model.Order;
+import com.factoryapp.model.OrderHistory;
 import com.factoryapp.model.Stage;
+import com.factoryapp.repository.OrderHistoryRepository;
 import com.factoryapp.repository.OrderRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.*;
 
+import java.time.Instant;
 import java.util.List;
 
 @Component
@@ -20,6 +24,7 @@ public class StageQueuePoller {
 
     private final SqsClient sqsClient;
     private final OrderRepository orderRepository;
+    private final OrderHistoryRepository orderHistoryRepository;
     private final ObjectMapper objectMapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -29,9 +34,10 @@ public class StageQueuePoller {
     @Value("${aws.region}")
     private String region;
 
-    public StageQueuePoller(SqsClient sqsClient, OrderRepository orderRepository) {
+    public StageQueuePoller(SqsClient sqsClient, OrderRepository orderRepository, OrderHistoryRepository orderHistoryRepository) {
         this.sqsClient = sqsClient;
         this.orderRepository = orderRepository;
+        this.orderHistoryRepository = orderHistoryRepository;
     }
 
     private String queueUrl(String stage, String priority) {
@@ -81,6 +87,15 @@ public class StageQueuePoller {
             order.setUpdatedAt(order.getCreatedAt()); //may cause issues later?
 
             orderRepository.save(order);
+
+            orderHistoryRepository.save(new OrderHistory(
+                    order.getOrderId(),
+                    Instant.now().toString(),
+                    stage,
+                    "system",
+                    Action.CREATED,
+                    null
+            ));
 
             sqsClient.deleteMessage(DeleteMessageRequest.builder()
                     .queueUrl(queueUrl)

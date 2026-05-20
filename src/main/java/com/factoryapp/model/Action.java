@@ -1,6 +1,7 @@
 package com.factoryapp.model;
 
 public enum Action {
+    CREATED,          // Order received into the system
     CONFIRMED,        // Sales confirmed the order
     REJECTED,         // Sales rejected the order
     STARTED,          // Line worker started production
