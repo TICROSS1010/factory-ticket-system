@@ -33,7 +33,7 @@ public class TestDataSeeder implements CommandLineRunner, DisposableBean {
             "Wayne Enterprises", "Oscorp", "Cyberdyne", "Weyland Corp", "Soylent Corp"
     };
 
-    private static final String[] ORDER_TYPES = {"standard", "custom", "rush-build"};
+    private static final String[] ORDER_TYPES = {"standard", "custom", "bulk"};
     private static final String[] PRIORITIES   = {"rush", "high", "normal"};
 
     public TestDataSeeder(SqsClient sqsClient, DynamoDbClient dynamoDbClient) {

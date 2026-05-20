@@ -89,8 +89,6 @@ Create `src/main/resources/application-dev.properties`:
 ```properties
 amazon.dynamodb.endpoint=http://localhost:8000
 aws.region=us-east-1
-aws.accessKeyId=fakekey
-aws.secretKey=fakekey
 ```
 
 > For SQS, SNS, and S3 you will need real AWS credentials and queue URLs. See [AWS setup](#aws-setup) below.
@@ -154,32 +152,12 @@ bash scripts/create-queues.sh
 
 Creates all 15 FIFO queues across 5 production stages (Rush, High, Normal per stage).
 
-#### Add real credentials to properties file
+#### Configure AWS properties
 
-```properties
-amazon.dynamodb.endpoint=http://localhost:8000
-aws.region=us-east-1
-aws.accessKeyId=YOUR_ACCESS_KEY
-aws.secretKey=YOUR_SECRET_KEY
-```
-
-> Never commit real credentials. `application-dev.properties` is in `.gitignore`.
+Add your AWS credentials to `src/main/resources/application-dev.properties`. That file is listed in `.gitignore` and should never be committed.
 
 ---
 
-## Dev Login Credentials
-
-> For development only.
-
-| Username | Password | Role |
-|----------|----------|------|
-| sales1 | test | Sales |
-| line1 | test | Line Worker |
-| quality1 | test | Quality |
-| packer1 | test | Packer |
-| shipping1 | test | Shipping |
-
----
 
 ## Project Structure
 
