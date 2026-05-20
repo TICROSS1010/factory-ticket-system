@@ -7,13 +7,14 @@ import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
 import software.amazon.awssdk.services.sqs.SqsClient;
-import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest;
-import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
+import software.amazon.awssdk.services.sqs.model.*;
 import org.springframework.beans.factory.DisposableBean;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Component
 @Profile("dev")
@@ -41,25 +42,44 @@ public class TestDataSeeder implements CommandLineRunner, DisposableBean {
         this.dynamoDbClient = dynamoDbClient;
     }
 
-    private void purgeAllQueues() {
+    private void drainAllQueues() {
         String[] stages = {"sales", "line", "quality", "packer", "shipping"};
 
         for (String stage : stages) {
             for (String priority : PRIORITIES) {
-                String queueUrl = "https://sqs." + region + ".amazonaws.com/" + accountId + "/" + stage + "-" + priority + "-queue.fifo";
-                try {
-                    sqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(queueUrl).build());
-                    System.out.println("Purged: " + stage + "-" + priority);
-                } catch (Exception e) {
-                    System.out.println("Could not purge " + stage + "-" + priority + ": " + e.getMessage());
-                }
+                String url = "https://sqs." + region + ".amazonaws.com/" + accountId + "/" + stage + "-" + priority + "-queue.fifo";
+                drainQueue(url, stage + "-" + priority);
             }
         }
     }
 
+    private void drainQueue(String queueUrl, String label) {
+        int deleted = 0;
+        while (true) {
+            List<Message> messages = sqsClient.receiveMessage(
+                    ReceiveMessageRequest.builder()
+                            .queueUrl(queueUrl)
+                            .maxNumberOfMessages(10)
+                            .waitTimeSeconds(1)
+                            .build()
+            ).messages();
+
+            if (messages.isEmpty()) break;
+
+            for (Message msg : messages) {
+                sqsClient.deleteMessage(DeleteMessageRequest.builder()
+                        .queueUrl(queueUrl)
+                        .receiptHandle(msg.receiptHandle())
+                        .build());
+                deleted++;
+            }
+        }
+        System.out.println("Drained " + deleted + " messages from: " + label);
+    }
+
     @Override
     public void run(String... args) {
-        purgeAllQueues();
+        drainAllQueues();
         purgeAllDynamoTables();
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
@@ -83,7 +103,7 @@ public class TestDataSeeder implements CommandLineRunner, DisposableBean {
                     .queueUrl(queueUrl)
                     .messageBody(body)
                     .messageGroupId("orders")
-                    .messageDeduplicationId("test-" + i)
+                    .messageDeduplicationId(orderId + "-" + UUID.randomUUID())
                     .build());
 
             System.out.println("Sent " + orderId + " (" + priority + ") to sales queue");
@@ -112,7 +132,7 @@ public class TestDataSeeder implements CommandLineRunner, DisposableBean {
 
     @Override
     public void destroy() {
-        purgeAllQueues();
+        drainAllQueues();
         purgeAllDynamoTables();
     }
 }
