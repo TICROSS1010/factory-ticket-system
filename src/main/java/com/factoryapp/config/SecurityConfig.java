@@ -11,10 +11,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+// Dev-only security config — Spring Security form login with hardcoded in-memory users.
+// In prod this is replaced by AWS Cognito OAuth2 (see application-prod.properties).
 @Configuration
 @Profile("dev")
 public class SecurityConfig {
 
+    // Configures form login, logout, and access rules
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -24,18 +27,19 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/logout")           // POST /logout triggers logout
-                        .logoutSuccessUrl("/login?logout")  // redirect here after
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
                         .permitAll()
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/css/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().authenticated()  // all other routes require login
                 );
 
         return http.build();
     }
 
+    // Creates one in-memory user per factory role for local development
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder encoder) {
         var manager = new InMemoryUserDetailsManager();

@@ -1,7 +1,8 @@
 package com.factoryapp.model;
 
+// Order priority levels — lower number = higher priority, used for sorting the ticket queue
 public enum Priority {
-    RUSH(1),
+    RUSH(1),    // Highest priority, always processed first
     HIGH(2),
     NORMAL(3);
 
@@ -11,6 +12,7 @@ public enum Priority {
         this.order = order;
     }
 
+    // Returns the sort value — lower means higher priority
     public int getOrder() {
         return order;
     }

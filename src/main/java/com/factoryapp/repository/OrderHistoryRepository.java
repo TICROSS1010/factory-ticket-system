@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+// Data access layer for the "orderHistory" DynamoDB table.
+// orderId (PK) + timestamp (SK) together uniquely identify each history entry.
+// Entries are append-only — never updated or deleted.
 @Repository
 public class OrderHistoryRepository {
 
@@ -30,7 +33,7 @@ public class OrderHistoryRepository {
                 .build());
     }
 
-    // ── Get full history for an order ─────────────────────────────────────
+    // ── Get full history for an order, oldest entry first ────────────────
     public List<OrderHistory> findByOrderId(String orderId) {
         QueryResponse response = dynamoDbClient.query(QueryRequest.builder()
                 .tableName(TABLE_NAME)
@@ -46,7 +49,7 @@ public class OrderHistoryRepository {
                 .collect(Collectors.toList());
     }
 
-    // ── Get latest action on an order ─────────────────────────────────────
+    // ── Get the most recent history entry for an order ───────────────────
     public OrderHistory findLatestByOrderId(String orderId) {
         QueryResponse response = dynamoDbClient.query(QueryRequest.builder()
                 .tableName(TABLE_NAME)
@@ -61,7 +64,7 @@ public class OrderHistoryRepository {
         return response.items().isEmpty() ? null : fromMap(response.items().get(0));
     }
 
-    // ── Convert OrderHistory → DynamoDB map ───────────────────────────────
+    // ── Convert OrderHistory → DynamoDB attribute map ────────────────────
     private Map<String, AttributeValue> toMap(OrderHistory history) {
         var map = new HashMap<String, AttributeValue>();
 
@@ -78,7 +81,7 @@ public class OrderHistoryRepository {
         return map;
     }
 
-    // ── Convert DynamoDB map → OrderHistory ───────────────────────────────
+    // ── Convert DynamoDB attribute map → OrderHistory ─────────────────────
     private OrderHistory fromMap(Map<String, AttributeValue> item) {
         return new OrderHistory(
                 item.get("orderId").s(),

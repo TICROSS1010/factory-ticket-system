@@ -13,6 +13,8 @@ import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.s3.S3Client;
 import java.net.URI;
 
+// Creates AWS service client beans used throughout the application.
+// Credentials and region are injected from the active profile's properties file.
 @Configuration
 public class AwsConfig {
 
@@ -25,6 +27,7 @@ public class AwsConfig {
     @Value("${aws.secretKey}")
     private String secretKey;
 
+    // Optional — only set in dev profile to point DynamoDB at localhost
     @Value("${aws.dynamodb.endpoint:}")
     private String dynamoEndpoint;
 
@@ -33,13 +36,14 @@ public class AwsConfig {
     public DynamoDbClient dynamoDbClient() {
         DynamoDbClientBuilder builder = DynamoDbClient.builder()
                 .region(Region.of(region));
-        //if dynamoEndpoint doesn't exist then it is using local DynamoDB for dev
+
+        // If an endpoint override is set, use DynamoDB Local with dummy credentials
         if (!dynamoEndpoint.isEmpty()) {
             builder.endpointOverride(URI.create(dynamoEndpoint))
                     .credentialsProvider(StaticCredentialsProvider.create(
                             AwsBasicCredentials.create("fakekey", "fakekey")));
-        //else in prod
         } else {
+            // Prod — use real AWS credentials from properties file
             builder.credentialsProvider(StaticCredentialsProvider.create(
                     AwsBasicCredentials.create(accessKeyId, secretKey)));
         }
@@ -47,7 +51,7 @@ public class AwsConfig {
         return builder.build();
     }
 
-    // SQS, SNS, S3 — always real AWS
+    // SQS — used for the priority queues between each production stage
     @Bean
     public SqsClient sqsClient() {
         return SqsClient.builder()
@@ -57,6 +61,7 @@ public class AwsConfig {
                 .build();
     }
 
+    // SNS — used to notify workers when an order reaches their stage
     @Bean
     public SnsClient snsClient() {
         return SnsClient.builder()
@@ -66,6 +71,7 @@ public class AwsConfig {
                 .build();
     }
 
+    // S3 — used to store shipping labels and reports
     @Bean
     public S3Client s3Client() {
         return S3Client.builder()

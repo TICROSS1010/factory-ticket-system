@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+// Dev-only utility that runs on startup and shutdown to reset the system to a clean state.
+// Drains all SQS queues, clears both DynamoDB tables, then seeds 10 test orders into SQS.
+// The queue poller picks them up and writes them to DynamoDB automatically.
 @Component
 @Profile("dev")
 public class TestDataSeeder implements CommandLineRunner, DisposableBean {
@@ -42,6 +45,7 @@ public class TestDataSeeder implements CommandLineRunner, DisposableBean {
         this.dynamoDbClient = dynamoDbClient;
     }
 
+    // Empties all 15 queues across every stage and priority
     private void drainAllQueues() {
         String[] stages = {"sales", "line", "quality", "packer", "shipping"};
 
@@ -53,6 +57,8 @@ public class TestDataSeeder implements CommandLineRunner, DisposableBean {
         }
     }
 
+    // Receives and deletes messages in batches of 10 until the queue is empty.
+    // Used instead of purgeQueue to avoid the 60-second AWS rate limit on purge calls.
     private void drainQueue(String queueUrl, String label) {
         int deleted = 0;
         while (true) {
@@ -77,6 +83,7 @@ public class TestDataSeeder implements CommandLineRunner, DisposableBean {
         System.out.println("Drained " + deleted + " messages from: " + label);
     }
 
+    // Runs on startup — resets all queues and tables, then seeds 10 fresh test orders
     @Override
     public void run(String... args) {
         drainAllQueues();
@@ -99,6 +106,7 @@ public class TestDataSeeder implements CommandLineRunner, DisposableBean {
                     orderId, customer, priority.toUpperCase(), orderType, quantity, dueDate, now
             );
 
+            // UUID dedup ID ensures SQS never silently drops re-sent messages on app restart
             sqsClient.sendMessage(SendMessageRequest.builder()
                     .queueUrl(queueUrl)
                     .messageBody(body)
@@ -110,6 +118,7 @@ public class TestDataSeeder implements CommandLineRunner, DisposableBean {
         }
     }
 
+    // Clears both DynamoDB tables by scanning and deleting each item individually
     private void purgeAllDynamoTables() {
         purgeTable("orders",       "orderId", null);
         purgeTable("orderHistory", "orderId", "timestamp");
