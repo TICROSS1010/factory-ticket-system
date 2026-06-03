@@ -164,14 +164,17 @@
             gap: 6px;
         }
 
-        .btn-confirm { background: #16a34a; }
-        .btn-reject  { background: #dc2626; }
-        .btn-start   { background: #2563eb; }
-        .btn-end     { background: #2563eb; }
-        .btn-pass    { background: #16a34a; }
-        .btn-fail    { background: #dc2626; }
-        .btn-packed  { background: #16a34a; }
-        .btn-shipped { background: #0f766e; }
+        .btn-confirm   { background: #16a34a; }
+        .btn-reject    { background: #dc2626; }
+        .btn-start     { background: #2563eb; }
+        .btn-hold      { background: #b45309; }
+        .btn-resume    { background: #2563eb; }
+        .btn-complete  { background: #16a34a; }
+        .btn-reset     { background: #374151; }
+        .btn-pass      { background: #16a34a; }
+        .btn-fail      { background: #dc2626; }
+        .btn-packed    { background: #16a34a; }
+        .btn-shipped   { background: #0f766e; }
 
         .btn {
             color: white;
@@ -187,6 +190,231 @@
 
         .btn:hover {
             opacity: 0.85;
+        }
+
+        /* ── On-hold row highlight ────────────────────────────────────── */
+        tr.row-on-hold td {
+            background: #3b2a00 !important;
+            border-bottom-color: #6b4a00 !important;
+        }
+
+        tr.row-on-hold:hover td {
+            background: #4a3500 !important;
+        }
+
+        /* ── QC return badge + reason ─────────────────────────────────── */
+        .qc-return {
+            display: inline-block;
+            margin-top: 4px;
+            color: #ef4444;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .qc-reason {
+            margin-top: 3px;
+            color: #fca5a5;
+            font-size: 10px;
+            font-style: italic;
+            max-width: 220px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ── Comment toggle button ────────────────────────────────────── */
+        .btn-comment {
+            position: relative;
+            background: none;
+            border: 1px solid #374151;
+            color: #6b7280;
+            padding: 4px 8px;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            line-height: 1;
+        }
+
+        .btn-comment:hover {
+            color: #d1d5db;
+            border-color: #4b5563;
+        }
+
+        .comment-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            font-size: 8px;
+            font-weight: 900;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        /* ── Error banner ─────────────────────────────────────────────── */
+        .error-banner {
+            background: #450a0a;
+            border: 1px solid #dc2626;
+            color: #fca5a5;
+            font-size: 11px;
+            padding: 8px 14px;
+            border-radius: 3px;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Comment panel ────────────────────────────────────────────── */
+        .comment-panel td {
+            background: #0d1520 !important;
+            padding: 12px 16px !important;
+            border-bottom: 2px solid #374151 !important;
+        }
+
+        .comment-panel textarea {
+            width: 100%;
+            background: #1f2937;
+            border: 1px solid #374151;
+            color: #e5e7eb;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 8px;
+            border-radius: 3px;
+            resize: vertical;
+            min-height: 60px;
+            outline: none;
+        }
+
+        .comment-panel textarea:focus {
+            border-color: #4b5563;
+        }
+
+        .comment-char-count {
+            font-size: 10px;
+            color: #6b7280;
+            margin-top: 4px;
+            text-align: right;
+            letter-spacing: 0.5px;
+        }
+
+        .comment-char-count.near-limit { color: #f59e0b; }
+        .comment-char-count.at-limit   { color: #ef4444; }
+
+        .comment-panel-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .btn-post-comment {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 5px 14px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .btn-post-comment:hover { opacity: 0.85; }
+
+        .btn-cancel-comment {
+            background: none;
+            border: 1px solid #374151;
+            color: #6b7280;
+            padding: 5px 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .btn-cancel-comment:hover { color: #9ca3af; border-color: #4b5563; }
+
+        .btn-fail-confirm { background: #dc2626; }
+
+        /* ── Chat area ────────────────────────────────────────────────── */
+        .chat-area {
+            max-height: 220px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-right: 4px;
+        }
+
+        .chat-area::-webkit-scrollbar { width: 4px; }
+        .chat-area::-webkit-scrollbar-track { background: #0d1520; }
+        .chat-area::-webkit-scrollbar-thumb { background: #374151; border-radius: 2px; }
+
+        .chat-msg {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 4px;
+            padding: 7px 10px;
+        }
+
+        .chat-msg-rejection {
+            background: #2d0a0a;
+            border-color: #7f1d1d;
+        }
+
+        .chat-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .chat-worker {
+            color: #f59e0b;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .chat-time {
+            color: #4b5563;
+            font-size: 10px;
+        }
+
+        .chat-rejection-label {
+            background: #7f1d1d;
+            color: #fca5a5;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .chat-text {
+            color: #d1d5db;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .chat-msg-rejection .chat-text {
+            color: #fca5a5;
+        }
+
+        .chat-empty, .chat-loading {
+            color: #4b5563;
+            font-size: 11px;
+            text-align: center;
+            padding: 16px 0;
+            letter-spacing: 1px;
         }
 
         /* ── Empty state ──────────────────────────────────────────────── */
@@ -220,6 +448,12 @@
 <!-- Content -->
 <div class="content">
 
+    <div class="error-banner" th:if="${error != null}"
+         th:text="${error == 'fail-reason-required'} ? 'A rejection reason is required — order was not failed.' :
+                  (${error == 'comment-too-long'} ? 'Text exceeds the ' + ${commentMaxLength} + ' character limit and was not saved.' :
+                  'An error occurred.')">
+    </div>
+
     <div class="queue-count"
          th:text="${tickets.size()} + ' ORDERS IN QUEUE // RUSH FIRST'">
         0 ORDERS IN QUEUE
@@ -247,8 +481,18 @@
         </tr>
 
         <!-- Order rows -->
-        <tr th:each="ticket : ${tickets}">
-            <td class="order-id" th:text="${ticket.orderId}"></td>
+        <th:block th:each="ticket : ${tickets}">
+        <tr th:class="${ticket.workStatus == 'ON_HOLD'} ? 'row-on-hold' : ''">
+            <td>
+                <div class="order-id" th:text="${ticket.orderId}"></div>
+                <span th:if="${ticket.returnCount != null and ticket.returnCount > 0}"
+                      class="qc-return">&#8629; QC</span>
+                <div sec:authorize="hasRole('LINE_WORKER')"
+                     th:if="${ticket.returnReason != null}"
+                     class="qc-reason"
+                     th:text="${ticket.returnReason}">
+                </div>
+            </td>
             <td class="text-main" th:text="${ticket.customer}"></td>
             <td>
                     <span class="badge"
@@ -267,27 +511,65 @@
                         <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
                               method="post" style="display:inline;">
                             <input type="hidden" name="action" value="CONFIRMED"/>
-                            <button class="btn btn-confirm" type="submit">Confirm</button>
+                            <button class="btn btn-confirm" type="submit"
+                                    onclick="return confirm('Confirm this order and send to production?')">Confirm</button>
                         </form>
                         <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
                               method="post" style="display:inline;">
                             <input type="hidden" name="action" value="REJECTED"/>
-                            <button class="btn btn-reject" type="submit">Reject</button>
+                            <button class="btn btn-reject" type="submit"
+                                    onclick="return confirm('Reject this order? It will be cancelled.')">Reject</button>
                         </form>
                     </div>
 
-                    <!-- Line worker buttons -->
+                    <!-- Line worker buttons — change based on work status -->
                     <div sec:authorize="hasRole('LINE_WORKER')">
-                        <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
-                              method="post" style="display:inline;">
-                            <input type="hidden" name="action" value="STARTED"/>
-                            <button class="btn btn-start" type="submit">Start</button>
-                        </form>
-                        <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
-                              method="post" style="display:inline;">
-                            <input type="hidden" name="action" value="COMPLETED"/>
-                            <button class="btn btn-end" type="submit">End</button>
-                        </form>
+
+                        <!-- Not yet started: show Start -->
+                        <th:block th:if="${ticket.workStatus == null}">
+                            <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
+                                  method="post" style="display:inline;">
+                                <input type="hidden" name="action" value="STARTED"/>
+                                <button class="btn btn-start" type="submit">Start</button>
+                            </form>
+                        </th:block>
+
+                        <!-- In progress: show Hold Work + Complete + Reset -->
+                        <th:block th:if="${ticket.workStatus == 'IN_PROGRESS'}">
+                            <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
+                                  method="post" style="display:inline;">
+                                <input type="hidden" name="action" value="HOLD"/>
+                                <button class="btn btn-hold" type="submit">Hold Work</button>
+                            </form>
+                            <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
+                                  method="post" style="display:inline;">
+                                <input type="hidden" name="action" value="COMPLETED"/>
+                                <button class="btn btn-complete" type="submit"
+                                        onclick="return confirm('Mark this order complete and send to Quality Check?')">Complete</button>
+                            </form>
+                            <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
+                                  method="post" style="display:inline;">
+                                <input type="hidden" name="action" value="RESET"/>
+                                <button class="btn btn-reset" type="submit"
+                                        onclick="return confirm('Do you want to reset all work done on this order?')">Reset</button>
+                            </form>
+                        </th:block>
+
+                        <!-- On hold: show Resume + Reset -->
+                        <th:block th:if="${ticket.workStatus == 'ON_HOLD'}">
+                            <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
+                                  method="post" style="display:inline;">
+                                <input type="hidden" name="action" value="RESUMED"/>
+                                <button class="btn btn-resume" type="submit">Resume</button>
+                            </form>
+                            <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
+                                  method="post" style="display:inline;">
+                                <input type="hidden" name="action" value="RESET"/>
+                                <button class="btn btn-reset" type="submit"
+                                        onclick="return confirm('Do you want to reset all work done on this order?')">Reset</button>
+                            </form>
+                        </th:block>
+
                     </div>
 
                     <!-- Quality buttons -->
@@ -295,13 +577,12 @@
                         <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
                               method="post" style="display:inline;">
                             <input type="hidden" name="action" value="PASSED"/>
-                            <button class="btn btn-pass" type="submit">Pass</button>
+                            <button class="btn btn-pass" type="submit"
+                                    onclick="return confirm('Pass this order and send to Packing?')">Pass</button>
                         </form>
-                        <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
-                              method="post" style="display:inline;">
-                            <input type="hidden" name="action" value="FAILED"/>
-                            <button class="btn btn-fail" type="submit">Fail</button>
-                        </form>
+                        <button class="btn btn-fail" type="button"
+                                th:data-order="${ticket.orderId}"
+                                onclick="toggleFailReason(this.dataset.order)">Fail</button>
                     </div>
 
                     <!-- Packer button -->
@@ -309,7 +590,8 @@
                         <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
                               method="post" style="display:inline;">
                             <input type="hidden" name="action" value="PACKED"/>
-                            <button class="btn btn-packed" type="submit">Confirm Packed</button>
+                            <button class="btn btn-packed" type="submit"
+                                    onclick="return confirm('Confirm order is packed and send to Shipping?')">Confirm Packed</button>
                         </form>
                     </div>
 
@@ -318,17 +600,184 @@
                         <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}"
                               method="post" style="display:inline;">
                             <input type="hidden" name="action" value="SHIPPED"/>
-                            <button class="btn btn-shipped" type="submit">Confirm Shipped</button>
+                            <button class="btn btn-shipped" type="submit"
+                                    onclick="return confirm('Confirm this order has shipped and mark as Delivered?')">Confirm Shipped</button>
                         </form>
                     </div>
+
+                    <!-- Comment button (all roles) -->
+                    <button class="btn-comment" type="button"
+                            th:data-order="${ticket.orderId}"
+                            th:data-last-comment-at="${ticket.lastCommentAt}"
+                            th:data-last-comment-by="${ticket.lastCommentBy}"
+                            onclick="toggleComment(this.dataset.order)"
+                            title="Comments">💬<span class="comment-badge">!</span></button>
 
                 </div>
             </td>
         </tr>
 
+        <!-- Inline comment panel -->
+        <tr class="comment-panel" th:id="'comment-' + ${ticket.orderId}" style="display:none;">
+            <td colspan="7">
+                <!-- Chat history -->
+                <div class="chat-area"
+                     th:id="'chat-' + ${ticket.orderId}"
+                     th:data-url="@{/tickets/{id}/comments(id=${ticket.orderId})}">
+                    <div class="chat-loading">LOADING...</div>
+                </div>
+                <!-- New message -->
+                <form th:action="@{/tickets/{id}/comment(id=${ticket.orderId})}" method="post">
+                    <textarea name="text"
+                              th:placeholder="'Add a message... (max ' + ${commentMaxLength} + ' characters)'"
+                              th:maxlength="${commentMaxLength}"
+                              th:data-counter="'count-' + ${ticket.orderId}"
+                              oninput="updateCharCount(this.dataset.counter, this.value.length, this.maxLength)"
+                    ></textarea>
+                    <div class="comment-char-count" th:id="'count-' + ${ticket.orderId}">
+                        0 / <span th:text="${commentMaxLength}">500</span>
+                    </div>
+                    <div class="comment-panel-actions">
+                        <button class="btn-post-comment" type="submit">Post</button>
+                        <button class="btn-cancel-comment" type="button"
+                                th:data-order="${ticket.orderId}"
+                                onclick="toggleComment(this.dataset.order)">Close</button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+
+        <!-- Fail reason panel (Quality only) -->
+        <tr class="comment-panel" th:id="'fail-reason-' + ${ticket.orderId}"
+            style="display:none;" sec:authorize="hasRole('QUALITY')">
+            <td colspan="7">
+                <form th:action="@{/tickets/{id}/action(id=${ticket.orderId})}" method="post">
+                    <input type="hidden" name="action" value="FAILED"/>
+                    <div style="color:#ef4444; font-size:10px; font-weight:700; letter-spacing:0.5px; margin-bottom:6px;">
+                        REJECTION REASON REQUIRED
+                    </div>
+                    <textarea name="reason" required
+                              th:placeholder="'Describe why this order is being rejected... (max ' + ${commentMaxLength} + ' characters)'"
+                              th:maxlength="${commentMaxLength}"
+                              th:data-counter="'fail-count-' + ${ticket.orderId}"
+                              oninput="updateCharCount(this.dataset.counter, this.value.length, this.maxLength)"
+                    ></textarea>
+                    <div class="comment-char-count" th:id="'fail-count-' + ${ticket.orderId}">
+                        0 / <span th:text="${commentMaxLength}">500</span>
+                    </div>
+                    <div class="comment-panel-actions">
+                        <button class="btn-post-comment btn-fail-confirm" type="submit">Confirm Fail</button>
+                        <button class="btn-cancel-comment" type="button"
+                                th:data-order="${ticket.orderId}"
+                                onclick="toggleFailReason(this.dataset.order)">Cancel</button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+        </th:block>
+
         </tbody>
     </table>
 </div>
+
+<span id="current-user" th:text="${currentUser}" style="display:none;"></span>
+
+<script>
+    function togglePanel(panelId, orderId) {
+        const panel = document.getElementById(panelId);
+        const visible = panel.style.display !== 'none';
+        panel.style.display = visible ? 'none' : 'table-row';
+        if (!visible) {
+            if (orderId) loadComments(orderId);
+            const ta = panel.querySelector('textarea');
+            if (ta) ta.focus();
+        } else {
+            const ta = panel.querySelector('textarea');
+            if (ta) { ta.value = ''; updateCharCount(ta.dataset.counter, 0, ta.maxLength); }
+        }
+    }
+
+    function toggleComment(orderId) {
+        togglePanel('comment-' + orderId, orderId);
+        markCommentsSeen(orderId);
+    }
+    function toggleFailReason(orderId) { togglePanel('fail-reason-' + orderId, null); }
+
+    function markCommentsSeen(orderId) {
+        const btn = document.querySelector(`.btn-comment[data-order="${orderId}"]`);
+        if (!btn) return;
+        const at = btn.dataset.lastCommentAt;
+        if (at) {
+            const me = document.getElementById('current-user').textContent;
+            localStorage.setItem('seen-' + me + '-' + orderId, at);
+        }
+        const badge = btn.querySelector('.comment-badge');
+        if (badge) badge.style.display = 'none';
+    }
+
+    function initBadges() {
+        const me = document.getElementById('current-user').textContent;
+        document.querySelectorAll('.btn-comment').forEach(btn => {
+            const at  = btn.dataset.lastCommentAt;
+            const by  = btn.dataset.lastCommentBy;
+            const id  = btn.dataset.order;
+            const badge = btn.querySelector('.comment-badge');
+            if (!at || !by || by === me) return;
+            const seen = localStorage.getItem('seen-' + me + '-' + id);
+            if (seen !== at) badge.style.display = 'flex';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initBadges);
+
+    function loadComments(orderId) {
+        const chatArea = document.getElementById('chat-' + orderId);
+        const url = chatArea.dataset.url;
+        chatArea.innerHTML = '<div class="chat-loading">LOADING...</div>';
+
+        fetch(url)
+            .then(r => r.json())
+            .then(messages => {
+                if (!messages.length) {
+                    chatArea.innerHTML = '<div class="chat-empty">NO MESSAGES YET</div>';
+                    return;
+                }
+                chatArea.innerHTML = messages.map(m => {
+                    const isRejection = m.type === 'FAILED';
+                    const date = new Date(m.timestamp).toLocaleString();
+                    const label = isRejection
+                        ? '<span class="chat-rejection-label">QC REJECTION</span>' : '';
+                    return `<div class="chat-msg${isRejection ? ' chat-msg-rejection' : ''}">
+                        <div class="chat-meta">
+                            <span class="chat-worker">${esc(m.worker)}</span>
+                            <span class="chat-time">${date}</span>
+                            ${label}
+                        </div>
+                        <div class="chat-text">${esc(m.text)}</div>
+                    </div>`;
+                }).join('');
+                chatArea.scrollTop = chatArea.scrollHeight;
+            })
+            .catch(() => {
+                chatArea.innerHTML = '<div class="chat-empty">FAILED TO LOAD</div>';
+            });
+    }
+
+    function updateCharCount(counterId, len, maxLen) {
+        const counter = document.getElementById(counterId);
+        if (!counter) return;
+        counter.textContent = len + ' / ' + maxLen;
+        counter.className = 'comment-char-count';
+        if (len >= maxLen)            counter.classList.add('at-limit');
+        else if (len >= maxLen * 0.9) counter.classList.add('near-limit');
+    }
+
+    function esc(str) {
+        const d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
+    }
+</script>
 
 </body>
 </html>
