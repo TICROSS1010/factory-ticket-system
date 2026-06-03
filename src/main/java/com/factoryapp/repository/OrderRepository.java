@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+// Data access layer for the "orders" DynamoDB table.
+// orderId is the partition key — all reads and writes go through this class.
 @Repository
 public class OrderRepository {
 
@@ -23,7 +25,7 @@ public class OrderRepository {
         this.dynamoDbClient = dynamoDbClient;
     }
 
-    // ── Save or update an order ───────────────────────────────────────────
+    // ── Save or update an order (putItem overwrites if orderId already exists) ─
     public void save(Order order) {
         dynamoDbClient.putItem(PutItemRequest.builder()
                 .tableName(TABLE_NAME)
@@ -31,7 +33,7 @@ public class OrderRepository {
                 .build());
     }
 
-    // ── Get single order by ID ────────────────────────────────────────────
+    // ── Fetch a single order by its ID ────────────────────────────────────
     public Order findById(String orderId) {
         GetItemResponse response = dynamoDbClient.getItem(GetItemRequest.builder()
                 .tableName(TABLE_NAME)
@@ -42,7 +44,7 @@ public class OrderRepository {
         return fromMap(response.item());
     }
 
-    // ── Get all orders at a specific stage ────────────────────────────────
+    // ── Scan the full table and filter by stage — returns all orders at that stage ─
     public List<Order> findByStage(Stage stage) {
         ScanResponse response = dynamoDbClient.scan(ScanRequest.builder()
                 .tableName(TABLE_NAME)
@@ -57,7 +59,7 @@ public class OrderRepository {
                 .collect(Collectors.toList());
     }
 
-    // ── Convert Order → DynamoDB map ──────────────────────────────────────
+    // ── Convert Order → DynamoDB attribute map ────────────────────────────
     private Map<String, AttributeValue> toMap(Order order) {
         var map = new HashMap<String, AttributeValue>();
 
@@ -76,11 +78,14 @@ public class OrderRepository {
         if (order.getParentOrderId() != null) map.put("parentOrderId", AttributeValue.fromS(order.getParentOrderId()));
         if (order.getNotes()         != null) map.put("notes",         AttributeValue.fromS(order.getNotes()));
         if (order.getAssignedTo()    != null) map.put("assignedTo",    AttributeValue.fromS(order.getAssignedTo()));
+        if (order.getWorkStatus()    != null) map.put("workStatus",    AttributeValue.fromS(order.getWorkStatus()));
+        if (order.getLastCommentAt() != null) map.put("lastCommentAt", AttributeValue.fromS(order.getLastCommentAt()));
+        if (order.getLastCommentBy() != null) map.put("lastCommentBy", AttributeValue.fromS(order.getLastCommentBy()));
 
         return map;
     }
 
-    // ── Convert DynamoDB map → Order ──────────────────────────────────────
+    // ── Convert DynamoDB attribute map → Order ────────────────────────────
     private Order fromMap(Map<String, AttributeValue> item) {
         return Order.builder()
                 .orderId(item.get("orderId").s())
@@ -97,6 +102,9 @@ public class OrderRepository {
                 .parentOrderId(item.containsKey("parentOrderId") ? item.get("parentOrderId").s() : null)
                 .notes(item.containsKey("notes")                ? item.get("notes").s()         : null)
                 .assignedTo(item.containsKey("assignedTo")      ? item.get("assignedTo").s()    : null)
+                .workStatus(item.containsKey("workStatus")      ? item.get("workStatus").s()    : null)
+                .lastCommentAt(item.containsKey("lastCommentAt") ? item.get("lastCommentAt").s() : null)
+                .lastCommentBy(item.containsKey("lastCommentBy") ? item.get("lastCommentBy").s() : null)
                 .build();
     }
 }
