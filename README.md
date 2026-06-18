@@ -13,7 +13,7 @@ Built as a portfolio project demonstrating Spring Boot, AWS services, and event-
 | Layer | Technology |
 |-------|------------|
 | Backend | Spring Boot 4.0.6 / Java 21 (Amazon Corretto) |
-| Frontend | Thymeleaf + CSS |
+| Frontend | React 18 + Vite (upgraded from Thymeleaf) |
 | Auth (Dev) | Spring Security form login |
 | Auth (Prod) | AWS Cognito hosted UI |
 | Database (Dev) | DynamoDB Local (Docker) |
@@ -71,6 +71,7 @@ All roles share one screen — buttons change based on the logged-in user's role
 
 - Java 21 (Amazon Corretto)
 - Maven
+- Node.js 20+
 - Docker
 - AWS CLI
 
@@ -93,17 +94,29 @@ aws.region=us-east-1
 
 > For SQS, SNS, and S3 you will need real AWS credentials and queue URLs. See [AWS setup](#aws-setup) below.
 
-#### 3. Run the app
+#### 3. Run the backend
 
 ```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-#### 4. Open in browser
+#### 4. Run the frontend dev server
+
+In a second terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+#### 5. Open in browser
 
 ```
-http://localhost:8080
+http://localhost:3000
 ```
+
+> The Vite dev server proxies `/api`, `/login`, and `/logout` to the Spring Boot backend on port 8080. In production (`./mvnw package`), the React app is built automatically and bundled into the Spring Boot jar — no separate frontend process needed.
 
 ---
 
@@ -111,7 +124,7 @@ http://localhost:8080
 
 The `.devcontainer/devcontainer.json` fully automates the environment:
 
-- Java 21 Corretto, Maven, AWS CLI, and Docker pre-installed
+- Java 21 Corretto, Maven, Node.js, AWS CLI, and Docker pre-installed
 - `application-dev.properties` created automatically
 - DynamoDB Local starts automatically on every Codespace open
 - Both DynamoDB tables created automatically via `docker-compose.yml`
@@ -124,18 +137,26 @@ Go to the repo on GitHub → **Code → Codespaces → Create codespace on main*
 
 Wait for the environment to finish building — everything is set up automatically.
 
-#### 2. Run the app
+#### 2. Run the backend
 
 ```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-#### 3. Open in browser
+#### 3. Run the frontend dev server
 
-Run this in the terminal to get your URL:
+In a second terminal:
 
 ```bash
-echo "https://${CODESPACE_NAME}-8080.app.github.dev"
+cd frontend && npm run dev
+```
+
+#### 4. Open in browser
+
+Run this in the terminal to get your Vite URL:
+
+```bash
+echo "https://${CODESPACE_NAME}-3000.app.github.dev"
 ```
 
 ---
@@ -162,12 +183,30 @@ Add your AWS credentials to `src/main/resources/application-dev.properties`. Tha
 ## Project Structure
 
 ```
+frontend/                           React + Vite frontend
+├── src/
+│   ├── api.js                      Fetch wrapper for all /api/* calls
+│   ├── App.jsx                     React Router root
+│   ├── index.css                   Global styles
+│   ├── components/
+│   │   ├── Navbar.jsx
+│   │   ├── TicketRow.jsx           Role-based action buttons, inline panels
+│   │   ├── CommentPanel.jsx        Chat history + new message form
+│   │   └── FailReasonPanel.jsx     QC rejection form
+│   └── pages/
+│       ├── LoginPage.jsx
+│       └── TicketsPage.jsx
+├── vite.config.js                  Dev proxy (:3000 → :8080), prod build → static/
+└── package.json
+
 src/main/java/com/factoryapp/
 ├── config/
 │   ├── AwsConfig.java              DynamoDB, SQS, SNS, S3 beans
 │   └── SecurityConfig.java         Dev form login / Prod OAuth2
 ├── controller/
-│   └── TicketController.java       Single controller for all roles
+│   ├── ApiController.java          REST API — /api/me, /api/tickets, actions, comments
+│   ├── SpaController.java          Forwards all non-API routes to index.html
+│   └── TicketController.java       Legacy form-POST endpoints (backward compat)
 ├── service/
 │   ├── OrderService.java           Stage transition logic
 │   ├── QueueService.java           SQS poll, send, delete
@@ -183,6 +222,8 @@ src/main/java/com/factoryapp/
 │   └── Action.java                 Enum: CONFIRMED / REJECTED / STARTED / COMPLETED / PASSED / FAILED etc.
 └── poller/
     └── StageQueuePoller.java       Polls Rush then High then Normal per stage
+
+src/main/resources/static/          React production build output (auto-generated)
 ```
 
 ---

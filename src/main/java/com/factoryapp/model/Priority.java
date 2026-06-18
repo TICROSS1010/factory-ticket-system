@@ -6,14 +6,13 @@ public enum Priority {
     HIGH(2),
     NORMAL(3);
 
-    private final int order;
+    private final int sortValue;
 
-    Priority(int order) {
-        this.order = order;
+    Priority(int sortValue) {
+        this.sortValue = sortValue;
     }
 
-    // Returns the sort value — lower means higher priority
-    public int getOrder() {
-        return order;
+    public int getSortValue() {
+        return sortValue;
     }
 }

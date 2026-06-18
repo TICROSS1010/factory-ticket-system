@@ -39,5 +39,9 @@ build/
 ### DynamoDB Local ###
 dynamodb-data/
 
+### Frontend ###
+frontend/node_modules/
+src/main/resources/static/
+
 
 
