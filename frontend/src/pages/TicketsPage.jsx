@@ -11,8 +11,8 @@ export default function TicketsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const load = useCallback(() => {
-    setLoading(true);
+  const load = useCallback((silent = false) => {
+    if (silent) setLoading(true);
     setError(null);
     Promise.all([getMe(), getTickets()])
       .then(([meData, ticketData]) => {
@@ -30,7 +30,11 @@ export default function TicketsPage() {
       });
   }, [navigate]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+    const id = setInterval(() => load(true), 5000);
+    return () => clearInterval(id);
+  }, [load]);
 
   if (loading) {
     return <div className="loading-page">LOADING...</div>;
