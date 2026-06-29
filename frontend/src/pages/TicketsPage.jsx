@@ -12,7 +12,7 @@ export default function TicketsPage() {
   const [error, setError] = useState(null);
 
   const load = useCallback((silent = false) => {
-    if (silent) setLoading(true);
+    if (!silent) setLoading(true);
     setError(null);
     Promise.all([getMe(), getTickets()])
       .then(([meData, ticketData]) => {

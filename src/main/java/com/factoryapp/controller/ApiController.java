@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -101,7 +102,7 @@ public class ApiController {
     private String roleName(Authentication auth) {
         return auth.getAuthorities().stream()
                 .findFirst()
-                .map(a -> a.getAuthority().replace("ROLE_", ""))
+                .map(a -> Objects.requireNonNull(a.getAuthority()).replace("ROLE_", ""))
                 .orElseThrow();
     }
 

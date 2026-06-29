@@ -26,7 +26,7 @@ export default function CommentPanel({ orderId, onClose, onPosted }) {
     try {
       await submitComment(orderId, text.trim());
       setText('');
-      onPosted();
+      onPosted(true);
       const updated = await getComments(orderId);
       setMessages(updated);
     } catch {

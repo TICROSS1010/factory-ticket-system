@@ -56,14 +56,15 @@ public class StageQueuePoller {
     @Scheduled(fixedDelay = 100)
     public void poll() {
         List<CompletableFuture<Void>> futures = List.of(
-            CompletableFuture.runAsync(() -> pollStage(Stage.SALES,       queueUrl("sales", "rush"),    queueUrl("sales", "high"),    queueUrl("sales", "normal")),    stageExecutor),
-            CompletableFuture.runAsync(() -> pollStage(Stage.LINE_WORKER, queueUrl("line", "rush"),     queueUrl("line", "high"),     queueUrl("line", "normal")),     stageExecutor),
-            CompletableFuture.runAsync(() -> pollStage(Stage.QUALITY,     queueUrl("quality", "rush"),  queueUrl("quality", "high"),  queueUrl("quality", "normal")),  stageExecutor),
-            CompletableFuture.runAsync(() -> pollStage(Stage.PACKER,      queueUrl("packer", "rush"),   queueUrl("packer", "high"),   queueUrl("packer", "normal")),   stageExecutor),
-            CompletableFuture.runAsync(() -> pollStage(Stage.SHIPPING,    queueUrl("shipping", "rush"), queueUrl("shipping", "high"), queueUrl("shipping", "normal")), stageExecutor)
+                CompletableFuture.runAsync(() -> pollStage(Stage.SALES, queueUrl("sales", "rush"), queueUrl("sales", "high"), queueUrl("sales", "normal")), stageExecutor),
+                CompletableFuture.runAsync(() -> pollStage(Stage.LINE_WORKER, queueUrl("line", "rush"), queueUrl("line", "high"), queueUrl("line", "normal")), stageExecutor),
+                CompletableFuture.runAsync(() -> pollStage(Stage.QUALITY, queueUrl("quality", "rush"), queueUrl("quality", "high"), queueUrl("quality", "normal")), stageExecutor),
+                CompletableFuture.runAsync(() -> pollStage(Stage.PACKER, queueUrl("packer", "rush"), queueUrl("packer", "high"), queueUrl("packer", "normal")), stageExecutor),
+                CompletableFuture.runAsync(() -> pollStage(Stage.SHIPPING, queueUrl("shipping", "rush"), queueUrl("shipping", "high"), queueUrl("shipping", "normal")), stageExecutor)
         );
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     }
+
 
     // Drains Rush and High before dropping to Normal long poll.
     // Keeps cycling as long as urgent work exists; only parks on Normal when both are empty.
