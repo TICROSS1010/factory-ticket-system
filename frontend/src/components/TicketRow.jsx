@@ -32,7 +32,7 @@ export default function TicketRow({ ticket, role, currentUser, onActionComplete 
     setBusy(true);
     try {
       await submitAction(ticket.orderId, action, reason);
-      onActionComplete();
+      onActionComplete(true);
     } catch (err) {
       alert(err.message === 'fail-reason-required'
         ? 'A rejection reason is required.'
