@@ -42,7 +42,7 @@ export default function TicketsPage() {
 
   return (
     <div className="tickets-body">
-      <Navbar username={me?.username} role={me?.role} onRefresh={load} />
+      <Navbar username={me?.username} role={me?.role} onRefresh={() => load(false)} />
 
       <div className="content">
         {error && <div className="error-banner">{error}</div>}
