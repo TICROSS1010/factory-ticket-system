@@ -13,7 +13,7 @@ Built as a portfolio project demonstrating Spring Boot, AWS services, and event-
 | Layer | Technology |
 |-------|------------|
 | Backend | Spring Boot 4.0.6 / Java 21 (Amazon Corretto) |
-| Frontend | React 18 + Vite (upgraded from Thymeleaf) |
+| Frontend | React 18 + Vite |
 | Auth (Dev) | Spring Security form login |
 | Auth (Prod) | AWS Cognito hosted UI |
 | Database (Dev) | DynamoDB Local (Docker) |
@@ -138,12 +138,11 @@ http://localhost:3000
 
 The `.devcontainer/devcontainer.json` fully automates the environment:
 
-- Java 21 Corretto, Maven, Node.js, AWS CLI, and Docker pre-installed
-- `application-dev.properties` created automatically
+- Java 21 Corretto, Maven, AWS CLI, and Docker pre-installed
 - DynamoDB Local starts automatically on every Codespace open
 - Both DynamoDB tables created automatically via `docker-compose.yml`
 
-No manual setup needed.
+You still need to create `application-dev.properties` manually (see [step 2 in Option A](#2-create-properties-file)).
 
 #### 1. Open Codespace
 
@@ -222,8 +221,7 @@ src/main/java/com/factoryapp/
 │   └── SecurityConfig.java         Dev form login / Prod OAuth2
 ├── controller/
 │   ├── ApiController.java          REST API — /api/me, /api/tickets, actions, comments
-│   ├── SpaController.java          Prod-only (@Profile("!dev")): forwards non-API routes to index.html
-│   └── TicketController.java       Legacy form-POST endpoints (backward compat)
+│   └── SpaController.java          Prod-only (@Profile("!dev")): forwards non-API routes to index.html
 ├── service/
 │   ├── OrderService.java           Stage transition logic
 │   ├── QueueService.java           SQS poll, send, delete
@@ -300,4 +298,6 @@ src/main/resources/static/          React production build output (auto-generate
 
 ## Documentation
 
-Full system design and architecture document available in `/docs/factory-system-design-v3.docx`
+Full system design and architecture document available in `/docs/`:
+- `factory-system-design-v4.docx`
+- `factory-system-design-v4.pdf`
