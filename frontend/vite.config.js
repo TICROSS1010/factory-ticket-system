@@ -4,11 +4,23 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: true,
     port: 3000,
+    watch: {
+      usePolling: true,
+      interval: 100,
+    },
     proxy: {
-      '/api':    'http://localhost:8080',
-      '/login':  'http://localhost:8080',
-      '/logout': 'http://localhost:8080',
+      '/api': process.env.VITE_BACKEND_URL ?? 'http://localhost:8080',
+      '/login': {
+        target: process.env.VITE_BACKEND_URL ?? 'http://localhost:8080',
+        bypass: (req) => {
+          // Let Vite serve the React app for GET /login so React Router renders LoginPage.
+          // Only POST /login (form submission) goes to Spring Security.
+          if (req.method === 'GET') return '/index.html';
+        },
+      },
+      '/logout': process.env.VITE_BACKEND_URL ?? 'http://localhost:8080',
     },
   },
   build: {
