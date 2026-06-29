@@ -102,12 +102,26 @@ aws.region=us-east-1
 
 #### 4. Run the frontend dev server
 
-In a second terminal:
+**Option 4a — Local terminal (simplest):**
 
 ```bash
 cd frontend
 npm install
 npm run dev
+```
+
+**Option 4b — Docker (no local Node required):**
+
+The `docker-compose.yml` includes a `frontend` service that runs the Vite dev server inside a Node 20 container. It connects to the Spring backend via `host.docker.internal:8080`.
+
+```bash
+docker compose up -d
+```
+
+This starts both DynamoDB Local and the Vite dev server. To override the backend URL:
+
+```bash
+VITE_BACKEND_URL=http://host.docker.internal:8080 docker compose up -d
 ```
 
 #### 5. Open in browser
@@ -116,7 +130,7 @@ npm run dev
 http://localhost:3000
 ```
 
-> The Vite dev server proxies `/api`, `/login`, and `/logout` to the Spring Boot backend on port 8080. In production (`./mvnw package`), the React app is built automatically and bundled into the Spring Boot jar — no separate frontend process needed.
+> The Vite dev server proxies `/api`, `/login`, and `/logout` to the Spring Boot backend. In dev, `GET /login` is served by React Router (not proxied) so the React login page renders correctly. In production (`./mvnw package`), the React app is built automatically and bundled into the Spring Boot jar — no separate frontend process needed.
 
 ---
 
@@ -145,7 +159,9 @@ Wait for the environment to finish building — everything is set up automatical
 
 #### 3. Run the frontend dev server
 
-In a second terminal:
+The `postStartCommand` in `.devcontainer/devcontainer.json` runs `docker compose up -d` on every Codespace start, which now also launches the `frontend` Docker service (Vite dev server on port 3000). Codespaces will auto-detect the port — accept the prompt to forward it, or forward it manually in the **Ports** panel.
+
+Alternatively, run it in a terminal:
 
 ```bash
 cd frontend && npm run dev
@@ -196,16 +212,17 @@ frontend/                           React + Vite frontend
 │   └── pages/
 │       ├── LoginPage.jsx
 │       └── TicketsPage.jsx
-├── vite.config.js                  Dev proxy (:3000 → :8080), prod build → static/
+├── vite.config.js                  Dev proxy (respects VITE_BACKEND_URL, falls back to :8080), Docker polling, prod build → static/
 └── package.json
 
 src/main/java/com/factoryapp/
 ├── config/
 │   ├── AwsConfig.java              DynamoDB, SQS, SNS, S3 beans
+│   ├── DevRedirectFilter.java      Dev-only: redirects browser GETs to Vite dev server (localhost:3000)
 │   └── SecurityConfig.java         Dev form login / Prod OAuth2
 ├── controller/
 │   ├── ApiController.java          REST API — /api/me, /api/tickets, actions, comments
-│   ├── SpaController.java          Forwards all non-API routes to index.html
+│   ├── SpaController.java          Prod-only (@Profile("!dev")): forwards non-API routes to index.html
 │   └── TicketController.java       Legacy form-POST endpoints (backward compat)
 ├── service/
 │   ├── OrderService.java           Stage transition logic
